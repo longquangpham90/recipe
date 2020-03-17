@@ -1,0 +1,22 @@
+<resources>
+    <string name="app_name">Recipe</string>
+    <string name="title_create_item">Create Item</string>
+    <string name="title_view_item">View</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hint_input_title">Title</string>
+    <string name="hint_input_description">Description</string>
+    <string name="hint_input_content">Content</string>
+    <string name="title_button_save">Save</string>
+    <string name="title_button_update">Update</string>
+    <string name="title_button_delete">Delete</string>
+    <string name="choose_file_image">Choose Image</string>
+    <string name="done">Done</string>
+    <string name="message_error_empty_input_title">Please input title</string>
+    <string name="message_error_empty_input_description">Please input desciption</string>
+    <string name="message_error_empty_input_content">Please input content</string>
+    <string name="message_save_data_successful">Save Successful</string>
+    <string name="message_update_data_successful">Update Successful</string>
+    <string name="message_delete_success">Delete successful</string>
+</resources>
