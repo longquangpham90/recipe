@@ -18,12 +18,13 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
         val mHelper = DaoMaster.DevOpenHelper(this, "recipe.db", null)
         val db: SQLiteDatabase = mHelper.writableDatabase
-        mHelper.onUpgrade(db, 1, 1)
+//        mHelper.onUpgrade(db, 1, 1)
         val daoMaster = DaoMaster(db)
         GlobalApp.getInstance().daoSession = daoMaster.newSession()
-        GlobalApp.getInstance().daoSession?.typeDao?.insertOrReplace(Type(1, 1, "Cake"))
-        GlobalApp.getInstance().daoSession?.typeDao?.insertOrReplace(Type(2, 2, "Rice"))
-        GlobalApp.getInstance().daoSession?.typeDao?.insertOrReplace(Type(3, 3, "Vegetable"))
+        GlobalApp.getInstance().daoSession?.typeDao?.insertOrReplace(Type(1, 1, "Category"))
+        GlobalApp.getInstance().daoSession?.typeDao?.insertOrReplace(Type(2, 2, "Cake"))
+        GlobalApp.getInstance().daoSession?.typeDao?.insertOrReplace(Type(3, 3, "Rice"))
+        GlobalApp.getInstance().daoSession?.typeDao?.insertOrReplace(Type(4, 4, "Vegetable"))
         GlobalApp.getInstance().categories = GlobalApp.getInstance().daoSession?.typeDao?.queryBuilder()?.list() as ArrayList<Type>
         Handler().postDelayed(Runnable {
             val intent = Intent(this@SplashActivity, MainActivity::class.java)

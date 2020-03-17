@@ -169,6 +169,10 @@ class CreateFragment : Fragment(), View.OnClickListener {
             edt_content.error = getString(R.string.message_error_empty_input_content)
             flag = true
         }
+        if (pecipe?.type == 1) {
+            Toast.makeText(activity!!, R.string.message_please_select_category, Toast.LENGTH_SHORT).show()
+            flag = true
+        }
         if (!flag) {
             pecipe?.trace()
             GlobalApp.getInstance().daoSession?.pecipeDao?.insertOrReplace(pecipe).let {
