@@ -1,5 +1,7 @@
 package com.smile.studio.recipe.model.greendao;
 
+import android.util.Log;
+
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
@@ -59,4 +61,7 @@ public class Type {
         this.title = title;
     }
 
+    public void trace() {
+        Log.e("Tag", "id: " + pid + "\ntitle: " + title);
+    }
 }

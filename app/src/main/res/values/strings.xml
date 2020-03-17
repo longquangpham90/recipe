@@ -19,4 +19,5 @@
     <string name="message_save_data_successful">Save Successful</string>
     <string name="message_update_data_successful">Update Successful</string>
     <string name="message_delete_success">Delete successful</string>
+    <string name="message_please_select_category">Please, select type category!</string>
 </resources>
