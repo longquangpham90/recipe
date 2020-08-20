@@ -20,9 +20,12 @@ import com.bumptech.glide.request.RequestOptions
 import com.esafirm.imagepicker.features.ImagePicker
 import com.gun0912.tedpermission.PermissionListener
 import com.gun0912.tedpermission.TedPermission
+import com.nekoloop.base64image.Base64Image
+import com.nekoloop.base64image.RequestEncode
 import com.smile.studio.recipe.R
 import com.smile.studio.recipe.activity.MainActivity
 import com.smile.studio.recipe.adapter.TypeAdapter
+import com.smile.studio.recipe.model.ExifUtil
 import com.smile.studio.recipe.model.GlobalApp
 import com.smile.studio.recipe.model.greendao.Pecipe
 import com.smile.studio.recipe.model.greendao.Type
@@ -68,7 +71,7 @@ class CreateFragment : Fragment(), View.OnClickListener {
             if (pecipe != null) {
                 id = pecipe?.id!!
                 endcodeBase64 = pecipe?.image
-                val decodeBase64 = Base64.getDecoder().decode(pecipe?.image)
+                val decodeBase64 = Base64.getMimeDecoder().decode(endcodeBase64)
                 val bitmap = BitmapFactory.decodeByteArray(decodeBase64, 0, decodeBase64.size)
                 Glide.with(activity!!)
                         .load(bitmap)
@@ -119,7 +122,7 @@ class CreateFragment : Fragment(), View.OnClickListener {
                             }
                         })
                         .setDeniedMessage("If you reject permission,you can not use this service\n\nPlease turn on permissions at [Setting] > [Permission]")
-                        .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA)
+                        .setPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA)
                         .check()
             }
             R.id.btn_save -> {
@@ -174,14 +177,13 @@ class CreateFragment : Fragment(), View.OnClickListener {
             flag = true
         }
         if (!flag) {
-            pecipe?.trace()
-            GlobalApp.getInstance().daoSession?.pecipeDao?.insertOrReplace(pecipe).let {
+            GlobalApp.getInstance().daoSession?.pecipeDao?.insertOrReplaceInTx(pecipe).let {
                 Toast.makeText(activity!!, message, Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    @SuppressLint("NewApi")
+    @SuppressLint("NewApi", "CheckResult")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         try {
             val images = ImagePicker.getImages(data)
@@ -189,24 +191,38 @@ class CreateFragment : Fragment(), View.OnClickListener {
                 val image = images.get(0).path
                 val originalImage = File(image)
                 val storagePath = Environment.getExternalStorageDirectory().absolutePath + File.separator + getString(R.string.app_name)
-                Resizer(activity).setTargetLength(1080).setQuality(80).setOutputFormat("JPEG").setOutputFilename("resized_image")
+                Resizer(activity).setTargetLength(720).setQuality(70).setOutputFormat("JPEG").setOutputFilename("resized_image")
                         .setOutputDirPath(storagePath).setSourceImage(originalImage)
                         .resizedFileAsFlowable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).doFinally {
-                    Log.e("Tag", "--- image: ${image}")
-                    Glide.with(this).load(image)
-                            .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL)
-                                    .format(DecodeFormat.PREFER_ARGB_8888)
-                                    .error(R.drawable.ic_image_blank)
-                                    .placeholder(R.drawable.ic_image_blank)
-                                    .dontAnimate())
-                            .thumbnail(0.5f)
-                            .into(thumb)
-                }.subscribe({
-                    resizedImage = it
-                    endcodeBase64 = Base64.getEncoder().encodeToString(resizedImage?.readBytes())
-                }, {
-                    Log.e("Tag", "--- Can't reszie image: ${it.message}")
-                })
+                            Log.e("Tag", "--- image: ${image}")
+                            Glide.with(this).load(image)
+                                    .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL)
+                                            .format(DecodeFormat.PREFER_RGB_565)
+                                            .error(R.drawable.ic_image_blank)
+                                            .placeholder(R.drawable.ic_image_blank)
+                                            .dontAnimate())
+                                    .thumbnail(0.5f)
+                                    .into(thumb)
+                        }.subscribe({
+                            resizedImage = it
+                            var bitmap = BitmapFactory.decodeFile(resizedImage?.absolutePath)
+                            bitmap = ExifUtil.rotateBitmap(originalImage.absolutePath, bitmap)
+                            Base64Image.with(activity)
+                                    .encode(bitmap)
+                                    .into(object : RequestEncode.Encode {
+                                        override fun onSuccess(base64: String?) {
+                                            endcodeBase64 = base64
+                                            Log.e("Tag", "--- Base64: ${endcodeBase64}")
+                                        }
+
+                                        override fun onFailure() {
+                                            Log.e("Tag", "--- Error Encode Base64")
+                                        }
+
+                                    })
+                        }, {
+                            Log.e("Tag", "--- Can't reszie image: ${it.message}")
+                        })
             }
         } catch (e: Exception) {
             Log.e("Tag", "--- Error: ${e.message}")
