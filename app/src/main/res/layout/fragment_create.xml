@@ -121,5 +121,4 @@
             android:visibility="gone"></TextView>
     </LinearLayout>
 
-
 </LinearLayout>

@@ -2,7 +2,8 @@ package com.smile.studio.recipe.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.BitmapFactory
+import android.graphics.Bitmap
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,8 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DecodeFormat
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.nekoloop.base64image.Base64Image
+import com.nekoloop.base64image.RequestDecode.Decode
 import com.smile.studio.recipe.R
 import com.smile.studio.recipe.model.OnItemClickListenerRecyclerView
 import com.smile.studio.recipe.model.greendao.Pecipe
@@ -45,15 +48,24 @@ class PecipeAdapter(val mContext: Context, val mData: ArrayList<Pecipe>) : Recyc
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.tv_title.text = mData.get(position).title
         holder.tv_description.text = mData.get(position).description
-        val decodeBase64 = Base64.getDecoder().decode(mData.get(position).image)
-        val bitmap = BitmapFactory.decodeByteArray(decodeBase64, 0, decodeBase64.size)
-        Glide.with(mContext)
-                .load(bitmap)
-                .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL)
-                        .format(DecodeFormat.PREFER_ARGB_8888).error(R.drawable.ic_image_blank)
-                        .placeholder(R.drawable.ic_image_blank).dontAnimate())
-                .thumbnail(0.5f)
-                .into(holder.thumb)
+        Base64Image.with(mContext)
+                .decode(mData.get(position).image.trim())
+                .into(object : Decode {
+                    override fun onSuccess(bitmap: Bitmap) {
+                        Glide.with(mContext)
+                                .load(bitmap)
+                                .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL)
+                                        .format(DecodeFormat.PREFER_ARGB_8888).error(R.drawable.ic_image_blank)
+                                        .placeholder(R.drawable.ic_image_blank).dontAnimate())
+                                .thumbnail(0.5f)
+                                .into(holder.thumb)
+                    }
+
+                    override fun onFailure() {
+                        Log.e("Tag", "--- Error Decode Base64")
+                    }
+                })
+
         holder.itemView.setOnClickListener { view ->
             onItemClick?.let {
                 it.onClick(view, position)

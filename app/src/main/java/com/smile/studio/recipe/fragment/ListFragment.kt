@@ -1,7 +1,6 @@
 package com.smile.studio.recipe.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -76,7 +75,6 @@ class ListFragment : Fragment() {
         }
         recyclerView.setHasFixedSize(true)
         val mData = GlobalApp.getInstance().daoSession?.pecipeDao?.queryBuilder()?.list() as ArrayList<Pecipe>
-        Log.e("Tag", "--- size: ${mData.size}")
         adapter?.addAll(mData)
         val mDividerItemDecoration = DividerItemDecoration(recyclerView.context, LinearLayoutManager.VERTICAL)
         recyclerView.addItemDecoration(mDividerItemDecoration)
