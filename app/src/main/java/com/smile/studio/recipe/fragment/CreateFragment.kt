@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.smile.studio.recipe.fragment
 
 import android.Manifest
@@ -64,7 +66,7 @@ class CreateFragment : Fragment(), View.OnClickListener {
     @SuppressLint("NewApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        adapter = TypeAdapter(activity!!, GlobalApp.getInstance().categories)
+        adapter = TypeAdapter(requireActivity(), GlobalApp.getInstance().categories)
         spinner.adapter = adapter
         arguments?.let {
             pecipe = it.getParcelable<Pecipe>(Pecipe::class.java.simpleName)!!
@@ -73,7 +75,7 @@ class CreateFragment : Fragment(), View.OnClickListener {
                 endcodeBase64 = pecipe?.image
                 val decodeBase64 = Base64.getMimeDecoder().decode(endcodeBase64)
                 val bitmap = BitmapFactory.decodeByteArray(decodeBase64, 0, decodeBase64.size)
-                Glide.with(activity!!)
+                Glide.with(requireActivity())
                         .load(bitmap)
                         .apply(RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.ALL)
                                 .format(DecodeFormat.PREFER_ARGB_8888).error(R.drawable.ic_image_blank)
@@ -108,10 +110,10 @@ class CreateFragment : Fragment(), View.OnClickListener {
     override fun onClick(v: View?) {
         when (v?.id!!) {
             R.id.thumb -> {
-                TedPermission.with(activity)
+                TedPermission.with(requireActivity())
                         .setPermissionListener(object : PermissionListener {
                             override fun onPermissionGranted() {
-                                ImagePicker.create(activity).single()
+                                ImagePicker.create(requireActivity()).single()
                                         .toolbarImageTitle(getString(R.string.choose_file_image))
                                         .toolbarDoneButtonText(getString(R.string.done))
                                         .start(100)
@@ -137,7 +139,7 @@ class CreateFragment : Fragment(), View.OnClickListener {
                         } else {
                             (activity as MainActivity).supportFragmentManager.beginTransaction().replace(R.id.container, ListFragment.newInstance()).commit()
                         }
-                        Toast.makeText(activity!!, getString(R.string.message_delete_success), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireActivity(), getString(R.string.message_delete_success), Toast.LENGTH_SHORT).show()
                     }
                 } catch (e: Exception) {
                     Log.e("Tag", "Error: ${e.message}")
@@ -173,12 +175,12 @@ class CreateFragment : Fragment(), View.OnClickListener {
             flag = true
         }
         if (pecipe?.type == 1) {
-            Toast.makeText(activity!!, R.string.message_please_select_category, Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireActivity(), R.string.message_please_select_category, Toast.LENGTH_SHORT).show()
             flag = true
         }
         if (!flag) {
             GlobalApp.getInstance().daoSession?.pecipeDao?.insertOrReplaceInTx(pecipe).let {
-                Toast.makeText(activity!!, message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireActivity(), message, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -191,7 +193,7 @@ class CreateFragment : Fragment(), View.OnClickListener {
                 val image = images.get(0).path
                 val originalImage = File(image)
                 val storagePath = Environment.getExternalStorageDirectory().absolutePath + File.separator + getString(R.string.app_name)
-                Resizer(activity).setTargetLength(720).setQuality(70).setOutputFormat("JPEG").setOutputFilename("resized_image")
+                Resizer(requireActivity()).setTargetLength(720).setQuality(70).setOutputFormat("JPEG").setOutputFilename("resized_image")
                         .setOutputDirPath(storagePath).setSourceImage(originalImage)
                         .resizedFileAsFlowable.subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).doFinally {
                             Log.e("Tag", "--- image: ${image}")
@@ -207,7 +209,7 @@ class CreateFragment : Fragment(), View.OnClickListener {
                             resizedImage = it
                             var bitmap = BitmapFactory.decodeFile(resizedImage?.absolutePath)
                             bitmap = ExifUtil.rotateBitmap(originalImage.absolutePath, bitmap)
-                            Base64Image.with(activity)
+                            Base64Image.with(requireActivity())
                                     .encode(bitmap)
                                     .into(object : RequestEncode.Encode {
                                         override fun onSuccess(base64: String?) {

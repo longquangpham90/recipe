@@ -2,7 +2,7 @@
 
 buildscript {
 
-    ext.kotlin_version = '1.4.0'
+    ext.kotlin_version = '1.5.0'
 
     repositories {
         google()
@@ -11,7 +11,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.1'
+        classpath 'com.android.tools.build:gradle:4.2.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -34,7 +34,7 @@ task clean(type: Delete) {
 
 ext {
     minSdkVersion = 16
-    compileSdkVersion = 29
-    targetSdkVersion = 29
-    buildToolsVersion = '29.0.3'
+    compileSdkVersion = 30
+    targetSdkVersion = 30
+    buildToolsVersion = '30.0.3'
 }

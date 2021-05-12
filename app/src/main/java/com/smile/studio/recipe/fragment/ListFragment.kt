@@ -35,8 +35,8 @@ class ListFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        layoutManager = LinearLayoutManager(activity)
-        adapterCategory = TypeAdapter(activity!!, GlobalApp.getInstance().categories)
+        layoutManager = LinearLayoutManager(requireActivity())
+        adapterCategory = TypeAdapter(requireActivity(), GlobalApp.getInstance().categories)
         spinner.adapter = adapterCategory
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
 
@@ -59,7 +59,7 @@ class ListFragment : Fragment() {
 
         }
         recyclerView.layoutManager = layoutManager
-        adapter = PecipeAdapter(activity!!, ArrayList())
+        adapter = PecipeAdapter(requireActivity(), ArrayList())
         recyclerView.adapter = adapter
         adapter?.onItemClick = object : OnItemClickListenerRecyclerView {
             override fun onClick(view: View?, position: Int) {
